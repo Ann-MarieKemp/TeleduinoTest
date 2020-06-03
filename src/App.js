@@ -1,26 +1,31 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { Component } from 'react';
 import './App.css';
+import axios from 'axios';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends Component {
+  constructor() {
+    super();
+    this.turnOnHandler = this.turnOnHandler.bind(this);
+    this.turnOffHandler = this.turnOffHandler.bind(this);
+  }
+  async turnOnHandler() {
+    console.log('this is turn on');
+    let res = await axios.GET(
+      'https://us01.proxy.teleduino.org/api/1.0/328.php?k={BF9599700F9E8D3D63C858A32A96D9EB}&r=getVersion'
+    );
+    console.log(res);
+  }
+  async turnOffHandler() {
+    console.log('this is turn off');
+  }
+  render() {
+    return (
+      <div className="App">
+        <button onClick={this.turnOnHandler}>Turn On</button>
+        <button onClick={this.turnOffHandler}>Turn Off</button>
+      </div>
+    );
+  }
 }
 
 export default App;
