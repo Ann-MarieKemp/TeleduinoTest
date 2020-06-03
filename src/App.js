@@ -11,6 +11,9 @@ class App extends Component {
     this.pinColor = this.pinColor.bind(this);
     this.turnOnColorAndValue = this.turnOnColorAndValue.bind(this);
     this.turnOffAll = this.turnOffAll.bind(this);
+    this.turnOnRandom = this.turnOnRandom.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleChange = this.handleChange.bind(this);
     this.state = {
       color: 'red',
       value: '255',
@@ -67,12 +70,19 @@ class App extends Component {
     console.log(randomColor);
     let randomValue = Math.floor(Math.random() * 255);
     console.log(randomValue);
-    this.turnDownHandler(randomColor, randomValue);
+    this.turnOnColorAndValue(randomColor, randomValue);
   }
   turnOffAll() {
     this.turnOffHandler('blue');
     this.turnOffHandler('green');
     this.turnOffHandler('red');
+  }
+  handleSubmit(e) {
+    e.preventDefault();
+    this.turnOnColorAndValue(this.state.color, this.state.value);
+  }
+  handleChange(e) {
+    this.setState({ ...this.state, [e.target.name]: e.target.value });
   }
 
   render() {
@@ -98,15 +108,25 @@ class App extends Component {
         </button>
         <button onClick={this.turnOnRandom}>Turn On Random Color</button>
         <button onClick={this.turnOffAll}>Turn Off All Colors</button>
-        <form>
-          <select id="colors">
+        <form onSubmit={this.handleSubmit}>
+          <select
+            name="color"
+            value={this.state.color}
+            onChange={this.handleChange}
+          >
             Color
             <option value="red">red</option>
             <option value="green">green</option>
             <option value="blue">blue</option>
           </select>
           <label>Value</label>
-          <input type="number" />
+          <input
+            name="value"
+            type="number"
+            value={this.state.value}
+            onChange={this.handleChange}
+          />
+          <input type="submit" />
         </form>
       </div>
     );
