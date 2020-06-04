@@ -14,10 +14,23 @@ class App extends Component {
     this.turnOnRandom = this.turnOnRandom.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.rgbColorVal = this.rgbColorVal.bind(this);
     this.state = {
       color: 'red',
       value: '255',
+      colorVal: '',
     };
+  }
+  rgbColorVal(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    console.log(result);
+    return result
+      ? {
+          r: parseInt(result[1], 16),
+          g: parseInt(result[2], 16),
+          b: parseInt(result[3], 16),
+        }
+      : null;
   }
   componentDidMount(color) {
     let pins = [5, 6, 9];
@@ -30,14 +43,11 @@ class App extends Component {
   pinColor(color) {
     let pin = 0;
     if (color === 'red') {
-      console.log('inredoff', pin);
       pin = 5;
     } else if (color === 'blue') {
       pin = 6;
-      console.log('inblueoff', pin);
     } else if (color === 'green') {
       pin = 9;
-      console.log('ingreenoff', pin);
     }
     return pin;
   }
@@ -52,24 +62,21 @@ class App extends Component {
 
   async turnOffHandler(color) {
     let pin = this.pinColor(color);
-    console.log('this is turn off', color, pin);
     let res = await axios.post(
       `http://us01.proxy.teleduino.org/api/1.0/328.php?k=${APIKey}&r=setDigitalOutput&pin=${pin}&output=0`
     );
-    console.log(res, 'output');
   }
   async turnOnColorAndValue(color, value) {
     let pin = this.pinColor(color);
-    await axios.post(
+    let res = await axios.post(
       `http://us01.proxy.teleduino.org/api/1.0/328.php?k=${APIKey}&r=setPwmOutput&pin=${pin}&output=${value}`
     );
+    console.log(res);
   }
   turnOnRandom() {
     let colors = ['red', 'green', 'blue'];
     let randomColor = colors[Math.floor(Math.random() * 3)];
-    console.log(randomColor);
     let randomValue = Math.floor(Math.random() * 255);
-    console.log(randomValue);
     this.turnOnColorAndValue(randomColor, randomValue);
   }
   turnOffAll() {
@@ -83,6 +90,19 @@ class App extends Component {
   }
   handleChange(e) {
     this.setState({ ...this.state, [e.target.name]: e.target.value });
+
+    if (e.target.name === 'colorVal') {
+      let rgbColor = this.rgbColorVal(e.target.value);
+      this.turnOffAll();
+      this.turnOnColorAndValue('red', rgbColor.r);
+      console.log('red');
+      this.turnOnColorAndValue('green', rgbColor.g);
+      console.log('green');
+      this.turnOnColorAndValue('blue', rgbColor.b);
+      console.log('blue');
+
+      console.log('red', rgbColor.r, 'blue', rgbColor.b, 'green', rgbColor.g);
+    }
   }
 
   render() {
@@ -127,6 +147,13 @@ class App extends Component {
             onChange={this.handleChange}
           />
           <input type="submit" />
+          <label>Color</label>
+          <input
+            name="colorVal"
+            type="color"
+            value={this.state.colorVal}
+            onChange={this.handleChange}
+          />
         </form>
       </div>
     );
