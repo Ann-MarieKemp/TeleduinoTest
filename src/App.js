@@ -62,7 +62,7 @@ class App extends Component {
 
   async turnOffHandler(color) {
     let pin = this.pinColor(color);
-    let res = await axios.post(
+    await axios.post(
       `http://us01.proxy.teleduino.org/api/1.0/328.php?k=${APIKey}&r=setDigitalOutput&pin=${pin}&output=0`
     );
   }
@@ -79,28 +79,40 @@ class App extends Component {
     let randomValue = Math.floor(Math.random() * 255);
     this.turnOnColorAndValue(randomColor, randomValue);
   }
-  turnOffAll() {
-    this.turnOffHandler('blue');
-    this.turnOffHandler('green');
-    this.turnOffHandler('red');
+  async turnOffAll() {
+    await axios.all([
+      axios.post(
+        `http://us01.proxy.teleduino.org/api/1.0/328.php?k=${APIKey}&r=setDigitalOutput&pin=5&output=0`
+      ),
+      axios.post(
+        `http://us01.proxy.teleduino.org/api/1.0/328.php?k=${APIKey}&r=setDigitalOutput&pin=6&output=0`
+      ),
+      await axios.post(
+        `http://us01.proxy.teleduino.org/api/1.0/328.php?k=${APIKey}&r=setDigitalOutput&pin=9&output=0`
+      ),
+    ]);
   }
   handleSubmit(e) {
     e.preventDefault();
     this.turnOnColorAndValue(this.state.color, this.state.value);
   }
-  handleChange(e) {
+  async handleChange(e) {
     this.setState({ ...this.state, [e.target.name]: e.target.value });
 
     if (e.target.name === 'colorVal') {
       let rgbColor = this.rgbColorVal(e.target.value);
       this.turnOffAll();
-      this.turnOnColorAndValue('red', rgbColor.r);
-      console.log('red');
-      this.turnOnColorAndValue('green', rgbColor.g);
-      console.log('green');
-      this.turnOnColorAndValue('blue', rgbColor.b);
-      console.log('blue');
-
+      await axios.all([
+        axios.post(
+          `http://us01.proxy.teleduino.org/api/1.0/328.php?k=${APIKey}&r=setPwmOutput&pin=5&output=${rgbColor.r}`
+        ),
+        axios.post(
+          `http://us01.proxy.teleduino.org/api/1.0/328.php?k=${APIKey}&r=setPwmOutput&pin=6&output=${rgbColor.b}`
+        ),
+        axios.post(
+          `http://us01.proxy.teleduino.org/api/1.0/328.php?k=${APIKey}&r=setPwmOutput&pin=9&output=${rgbColor.g}`
+        ),
+      ]);
       console.log('red', rgbColor.r, 'blue', rgbColor.b, 'green', rgbColor.g);
     }
   }
