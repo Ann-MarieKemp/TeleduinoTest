@@ -6,7 +6,7 @@ const db = require('./models/db');
 const morgan = require('morgan');
 app.use(morgan('dev'));
 
-app.use(express.static(path.join(__dirname, './path/to/static/assets')));
+app.use(express.static(path.join(__dirname, '../build')));
 
 const bodyParser = require('body-parser');
 app.use(bodyParser.json());
@@ -14,8 +14,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use('/api', require('./apiRoutes'));
 
-app.get('*', function (req, res) {
-  res.sendFile(path.join(__dirname, './path/to/index.html'));
+app.get('/', function (req, res) {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
 app.use(function (err, req, res, next) {
@@ -24,7 +24,7 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500).send(err.message || 'Internal server error.');
 });
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 1337;
 
 db.sync({ force: true }).then(function () {
   app.listen(port, function () {
