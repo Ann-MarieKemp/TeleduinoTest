@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const path = require('path');
+const db = require('./models/db');
 
 const morgan = require('morgan');
 app.use(morgan('dev'));
@@ -25,6 +26,8 @@ app.use(function (err, req, res, next) {
 
 const port = process.env.PORT || 3000;
 
-app.listen(port, function () {
-  console.log(`It's time to light the lights...`);
+db.sync({ force: true }).then(function () {
+  app.listen(port, function () {
+    console.log(`It's time to light the lights...`);
+  });
 });
