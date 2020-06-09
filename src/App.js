@@ -32,7 +32,9 @@ class App extends Component {
         }
       : null;
   }
-  componentDidMount(color) {
+  async componentDidMount(color) {
+    let res = await axios.get('/api/user');
+    console.log(res);
     let pins = [5, 6, 9];
     pins.forEach(async (pinNumber) => {
       await axios.post(
