@@ -6,6 +6,7 @@ import APIKey from '../src/secrets.js';
 class App extends Component {
   constructor() {
     super();
+    this.ws = new WebSocket('ws://localhost:1337/ws');
     this.turnOnHandler = this.turnOnHandler.bind(this);
     this.turnOffHandler = this.turnOffHandler.bind(this);
     this.pinColor = this.pinColor.bind(this);
@@ -33,6 +34,14 @@ class App extends Component {
       : null;
   }
   async componentDidMount(color) {
+    this.ws.onopen = () => {
+      // on connecting, do nothing but log it to the console
+      console.log('connected');
+    };
+    this.ws.onclose = () => {
+      console.log('disconnected');
+      // automatically try to reconnect on connection loss
+    };
     let res = await axios.get('/api/user');
     console.log(res);
     let pins = [5, 6, 9];
